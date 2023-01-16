@@ -1,4 +1,5 @@
-﻿using BattleShips.Builders;
+﻿using System;
+using BattleShips.Builders;
 using BattleShips.Game;
 
 namespace BattleShips.Demo;
@@ -9,7 +10,11 @@ public static class Program
     {
         GameBoard board = new GameBoardBuilder()
             .AddPlayer("Pawel")
-            .SetGridSize(-1)
+            .SetGridSize(10)
+            .SetMaxDestroyers(2)
+            .SetMaxBattleShips(1)
+            .SetInput(Console.In)
+            .SetOutput(Console.Out)
             .Build();
            
 

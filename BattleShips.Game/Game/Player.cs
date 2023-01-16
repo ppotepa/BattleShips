@@ -1,4 +1,6 @@
-﻿namespace BattleShips.Game;
+﻿using BattleShips.Abstractions;
+
+namespace BattleShips.Game;
 
 internal class Player
 {
@@ -8,4 +10,5 @@ internal class Player
     }
 
     public string Name { get; init; }
+    public List<Ship> Ships { get; set; } = new();
 }

@@ -2,7 +2,7 @@ using NUnit.Framework;
 
 namespace BattleShips.Tests
 {
-    public class GridTests
+    public class BuilderTests
     {
         [SetUp]
         public void Setup()

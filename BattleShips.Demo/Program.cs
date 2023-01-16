@@ -10,12 +10,9 @@ public static class Program
     {
         GameBoard board = new GameBoardBuilder()
             .AddPlayer("Pawel")
-            .SetGridSize(10)
-            .SetMaxBattleShips(1)
-            .SetMaxDestroyers(2)
-            .SetInput(Console.In)
-            .SetOutput(Console.Out)
+            .SetGridSize(-1)
             .Build();
+           
 
         while (board.InProgress)
         {

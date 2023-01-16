@@ -49,7 +49,7 @@ internal class GameBoardValidator
 
         if (Options.Players.Count <= 0)
         {
-            exceptions.Add(new InvalidAmountOfPlayersSpecified(
+            exceptions.Add(new InvalidAmountOfPlayersSpecifiedException(
                 $"Total amount of players must be greater than 0."));
         }
 

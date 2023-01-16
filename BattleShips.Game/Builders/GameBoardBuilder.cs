@@ -44,6 +44,7 @@ namespace BattleShips.Builders
             {
                 _options.Output?.WriteLine(ex.Message);
                 gameBoard.InProgress = false;
+                throw;
             }
 
             gameBoard.InProgress = true;

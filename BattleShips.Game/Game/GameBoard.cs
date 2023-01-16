@@ -2,6 +2,7 @@
 using BattleShips.Enumerations;
 using BattleShips.Options;
 using BattleShips.Ships;
+using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 
@@ -72,7 +73,7 @@ namespace BattleShips.Game
 
             foreach (Player player in Options.Players)
             {
-                Enumerable.Range(0, Options.MaxNumberOfBattleShips + 1).ToList().ForEach((battleShip) =>
+                Enumerable.Range(0, Options.MaxNumberOfBattleShips).ToList().ForEach((battleShip) =>
                 {
                     Random random = new Random();
                     ShipDirection shipDirection = (ShipDirection)random.Next(1, 3);
@@ -86,58 +87,32 @@ namespace BattleShips.Game
                             Y = random.Next(0, Options.GridSize)
                         };
 
-                        if (shipDirection == ShipDirection.Horizontal && startingPos.X < 5)
+                        Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
+                        Tile[] line = default;
+
+                        if (shipDirection == ShipDirection.Horizontal && startingPos.X < BattleshipLength)
                         {
-                            Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
-                            Tile[] line = {
-                                target,
-                                target.Right,
-                                target.Right.Right,
-                                target.Right.Right.Right,
-                                target.Right.Right.Right.Right,
-                            };
-
-                            if (line.All(tile => tile.IsOccupied is false))
-                            {
-                                BattleShip newShip = new BattleShip { ShipTile = target, Owner = player };
-                                player.Ships.Add(newShip);
-                                Ships.Add(newShip);
-
-                                Array.ForEach(line, tile =>
-                                {
-                                    tile.Ship = newShip;
-                                    newShip.AllTiles.Add(tile);
-                                });
-
-                                isBuilt = true;
-                            }
+                            line = GenerateLineTiles(target, shipDirection, BattleshipLength);
                         }
 
-                        if (shipDirection == ShipDirection.Vertical && startingPos.Y < 5)
+                        if (shipDirection == ShipDirection.Vertical && startingPos.Y < BattleshipLength)
                         {
-                            Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
-                            Tile[] line = {
-                                target,
-                                target.Down,
-                                target.Down.Down,
-                                target.Down.Down.Down,
-                                target.Down.Down.Down.Down,
-                            };
+                            line = GenerateLineTiles(target, shipDirection, BattleshipLength);
+                        }
 
-                            if (line.All(tile => tile.IsOccupied is false))
+                        if (line != null && line.All(tile => tile.IsOccupied is false))
+                        {
+                            Ship newShip = new BattleShip { ShipTile = target, Owner = player };
+                            player.Ships.Add(newShip);
+                            Ships.Add(newShip);
+
+                            Array.ForEach(line, tile =>
                             {
-                                BattleShip newShip = new BattleShip { ShipTile = target, Owner = player };
-                                player.Ships.Add(newShip);
-                                Ships.Add(newShip);
+                                tile.Ship = newShip;
+                                newShip.AllTiles.Add(tile);
+                            });
 
-                                Array.ForEach(line, tile =>
-                                {
-                                    tile.Ship = newShip;
-                                    newShip.AllTiles.Add(tile);
-                                });
-
-                                isBuilt = true;
-                            }
+                            isBuilt = true;
                         }
                     }
                 });
@@ -156,62 +131,59 @@ namespace BattleShips.Game
                             Y = random.Next(0, Options.GridSize)
                         };
 
+                        Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
+                        Tile[] line = default;
+
                         if (shipDirection == ShipDirection.Horizontal && startingPos.X < DestroyerLength)
                         {
-                            Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
-                            Tile[] line = {
-                                target,
-                                target.Right,
-                                target.Right.Right,
-                                target.Right.Right.Right,
-                            };
-
-                            if (line.All(tile => tile.IsOccupied is false))
-                            {
-                                BattleShip newShip = new BattleShip { ShipTile = target, Owner = player };
-                                player.Ships.Add(newShip);
-                                Ships.Add(newShip);
-
-                                Array.ForEach(line, tile =>
-                                {
-                                    tile.Ship = newShip;
-                                    newShip.AllTiles.Add(tile);
-                                });
-
-                                isBuilt = true;
-                            }
+                            line = GenerateLineTiles(target, shipDirection, DestroyerLength);
                         }
 
                         if (shipDirection == ShipDirection.Vertical && startingPos.Y < DestroyerLength)
                         {
-                            Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
-                            Tile[] line = {
-                                target,
-                                target.Down,
-                                target.Down.Down,
-                                target.Down.Down.Down
-                            };
+                            line = GenerateLineTiles(target, shipDirection, DestroyerLength);
+                        }
 
-                            if (line.All(tile => tile.IsOccupied is false))
+                        if (line != null && line.All(tile => tile.IsOccupied is false))
+                        {
+                            Destroyer newShip = new Destroyer() { ShipTile = target, Owner = player };
+                            player.Ships.Add(newShip);
+                            Ships.Add(newShip);
+
+                            Array.ForEach(line, tile =>
                             {
-                                Destroyer newShip = new Destroyer() { ShipTile = target, Owner = player };
-                                player.Ships.Add(newShip);
-                                Ships.Add(newShip);
+                                tile.Ship = newShip;
+                                newShip.AllTiles.Add(tile);
+                            });
 
-                                Array.ForEach(line, tile =>
-                                {
-                                    tile.Ship = newShip;
-                                    newShip.AllTiles.Add(tile);
-                                });
-
-                                isBuilt = true;
-                            }
+                            isBuilt = true;
                         }
                     }
                 });
             }
 
             return this;
+        }
+
+        private Tile[] GenerateLineTiles(Tile target, ShipDirection shipDirection, int shipLength)
+        {
+            IEnumerable<Tile> result = new[] { target };
+
+            for ((int length, Tile target) data = (1, target); data.length++ < shipLength;)
+            {
+                if (shipDirection == ShipDirection.Horizontal)
+                {
+                    data.target = data.target.Right;
+                    result = result.Append(data.target);
+                }
+                else
+                {
+                    data.target = data.target.Down;
+                    result = result.Append(data.target);
+                }
+            }
+
+            return result.ToArray();
         }
     }
 }

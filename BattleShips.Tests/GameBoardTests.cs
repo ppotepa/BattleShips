@@ -29,9 +29,35 @@ namespace BattleShips.Tests
 
             gameBoard.Initialize();
             Assert.True(
-                gameBoard.Ships.Count is 2 &&
-                gameBoard.Ships.Any(ship => ship.GetType() == typeof(BattleShip)) &&
-                gameBoard.Ships.Any(ship => ship.GetType() == typeof(Destroyer))
+                gameBoard.Ships.Count is 2
+                && gameBoard.Ships.Any(ship => ship.GetType() == typeof(BattleShip))
+                && gameBoard.Ships.Any(ship => ship.GetType() == typeof(Destroyer))
+            );
+        }
+
+        [Test]
+        public void Ships_Should_Be_Correct_Length()
+        {
+            GameBoard gameBoard = new GameBoard
+            {
+                Options = new()
+                {
+                    GridSize = 10,
+                    MaxNumberOfBattleShips = 1,
+                    MaxNumberOfDestroyers = 1,
+                    Players =
+                    {
+                        new Player("Player 1")
+                    }
+                }
+            };
+
+            gameBoard.Initialize();
+
+            Assert.True(
+                gameBoard.Ships.Count is 2 
+                && gameBoard.Ships.First(ship => ship.GetType() == typeof(BattleShip)).AllTiles.Count == 5 
+                && gameBoard.Ships.First(ship => ship.GetType() == typeof(Destroyer)).AllTiles.Count == 4
             );
         }
 

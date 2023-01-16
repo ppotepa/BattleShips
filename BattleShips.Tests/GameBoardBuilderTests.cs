@@ -24,6 +24,7 @@ namespace BattleShips.Tests
             );
         }
 
+        [Test]
         public void Builder_Does_Not_Throw_Any_Exceptions_If_Options_Are_Correct()
         {
             GameBoardBuilder? builder = new GameBoardBuilder()

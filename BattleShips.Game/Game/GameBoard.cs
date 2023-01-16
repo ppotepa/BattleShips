@@ -1,4 +1,5 @@
-﻿using BattleShips.Abstractions;
+﻿using System.Collections.Immutable;
+using BattleShips.Abstractions;
 using BattleShips.Enumerations;
 using BattleShips.Options;
 using BattleShips.Ships;
@@ -73,14 +74,22 @@ namespace BattleShips.Game
 
             foreach (Player player in Options.Players)
             {
-                Enumerable.Range(0, Options.MaxNumberOfBattleShips).ToList().ForEach((battleShip) =>
+                Random random = new Random();
+
+                IEnumerable<Type> battleShips = Enumerable.Repeat(typeof(BattleShip), Options.MaxNumberOfBattleShips);
+                IEnumerable<Type> destroyers = Enumerable.Repeat(typeof(Destroyer), Options.MaxNumberOfDestroyers);
+
+                List<Type> allShips = battleShips.Concat(destroyers).ToList();
+
+                allShips.ForEach(shipType =>
                 {
-                    Random random = new Random();
                     ShipDirection shipDirection = (ShipDirection)random.Next(1, 3);
                     bool isBuilt = false;
 
                     while (isBuilt is false)
                     {
+                        int targetLength = shipType == typeof(BattleShip) ? BattleshipLength : DestroyerLength;
+
                         Vector2 startingPos = new Vector2
                         {
                             X = random.Next(0, Options.GridSize),
@@ -90,63 +99,15 @@ namespace BattleShips.Game
                         Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
                         Tile[] line = default;
 
-                        if (shipDirection == ShipDirection.Horizontal && startingPos.X < BattleshipLength)
-                        {
-                            line = GenerateLineTiles(target, shipDirection, BattleshipLength);
-                        }
+                        bool canBuildHorizontal = shipDirection == ShipDirection.Horizontal && startingPos.X < targetLength;
+                        bool canBuildVertical = shipDirection == ShipDirection.Vertical && startingPos.Y < targetLength;
 
-                        if (shipDirection == ShipDirection.Vertical && startingPos.Y < BattleshipLength)
-                        {
-                            line = GenerateLineTiles(target, shipDirection, BattleshipLength);
-                        }
+                        if (canBuildHorizontal || canBuildVertical)
+                            line = GenerateLineTiles(target, shipDirection, targetLength);
 
                         if (line != null && line.All(tile => tile.IsOccupied is false))
                         {
-                            Ship newShip = new BattleShip { ShipTile = target, Owner = player };
-                            player.Ships.Add(newShip);
-                            Ships.Add(newShip);
-
-                            Array.ForEach(line, tile =>
-                            {
-                                tile.Ship = newShip;
-                                newShip.AllTiles.Add(tile);
-                            });
-
-                            isBuilt = true;
-                        }
-                    }
-                });
-
-                Enumerable.Range(0, Options.MaxNumberOfDestroyers).ToList().ForEach((destroyer) =>
-                {
-                    Random random = new Random();
-                    ShipDirection shipDirection = (ShipDirection)random.Next(1, 3);
-                    bool isBuilt = false;
-
-                    while (isBuilt is false)
-                    {
-                        Vector2 startingPos = new Vector2
-                        {
-                            X = random.Next(0, Options.GridSize),
-                            Y = random.Next(0, Options.GridSize)
-                        };
-
-                        Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
-                        Tile[] line = default;
-
-                        if (shipDirection == ShipDirection.Horizontal && startingPos.X < DestroyerLength)
-                        {
-                            line = GenerateLineTiles(target, shipDirection, DestroyerLength);
-                        }
-
-                        if (shipDirection == ShipDirection.Vertical && startingPos.Y < DestroyerLength)
-                        {
-                            line = GenerateLineTiles(target, shipDirection, DestroyerLength);
-                        }
-
-                        if (line != null && line.All(tile => tile.IsOccupied is false))
-                        {
-                            Destroyer newShip = new Destroyer() { ShipTile = target, Owner = player };
+                            Ship newShip = Ship.Create(shipType, target, player);
                             player.Ships.Add(newShip);
                             Ships.Add(newShip);
 
@@ -174,13 +135,12 @@ namespace BattleShips.Game
                 if (shipDirection == ShipDirection.Horizontal)
                 {
                     data.target = data.target.Right;
-                    result = result.Append(data.target);
                 }
                 else
                 {
                     data.target = data.target.Down;
-                    result = result.Append(data.target);
                 }
+                result = result.Append(data.target);
             }
 
             return result.ToArray();

@@ -3,6 +3,7 @@ using BattleShips.Enumerations;
 using BattleShips.Options;
 using BattleShips.Ships;
 using System.Numerics;
+using System.Security.Cryptography;
 
 namespace BattleShips.Game
 {
@@ -35,7 +36,7 @@ namespace BattleShips.Game
                     }
                     else
                     {
-                        Options.Output.Write(Tiles[y, x].Ship != null ? "[X]" : "[ ]");
+                        Options.Output.Write(Tiles[y, x].Ship != null ? $"[{Tiles[y, x].Ship}]" : "[ ]");
                     }
                 }
 
@@ -75,7 +76,6 @@ namespace BattleShips.Game
                 {
                     Random random = new Random();
                     ShipDirection shipDirection = (ShipDirection)random.Next(1, 3);
-
                     bool isBuilt = false;
 
                     while (isBuilt is false)
@@ -144,6 +144,70 @@ namespace BattleShips.Game
 
                 Enumerable.Range(0, Options.MaxNumberOfDestroyers).ToList().ForEach((destroyer) =>
                 {
+                    Random random = new Random();
+                    ShipDirection shipDirection = (ShipDirection)random.Next(1, 3);
+                    bool isBuilt = false;
+
+                    while (isBuilt is false)
+                    {
+                        Vector2 startingPos = new Vector2
+                        {
+                            X = random.Next(0, Options.GridSize),
+                            Y = random.Next(0, Options.GridSize)
+                        };
+
+                        if (shipDirection == ShipDirection.Horizontal && startingPos.X < DestroyerLength)
+                        {
+                            Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
+                            Tile[] line = {
+                                target,
+                                target.Right,
+                                target.Right.Right,
+                                target.Right.Right.Right,
+                            };
+
+                            if (line.All(tile => tile.IsOccupied is false))
+                            {
+                                BattleShip newShip = new BattleShip { ShipTile = target, Owner = player };
+                                player.Ships.Add(newShip);
+                                Ships.Add(newShip);
+
+                                Array.ForEach(line, tile =>
+                                {
+                                    tile.Ship = newShip;
+                                    newShip.AllTiles.Add(tile);
+                                });
+
+                                isBuilt = true;
+                            }
+                        }
+
+                        if (shipDirection == ShipDirection.Vertical && startingPos.Y < DestroyerLength)
+                        {
+                            Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
+                            Tile[] line = {
+                                target,
+                                target.Down,
+                                target.Down.Down,
+                                target.Down.Down.Down
+                            };
+
+                            if (line.All(tile => tile.IsOccupied is false))
+                            {
+                                Destroyer newShip = new Destroyer() { ShipTile = target, Owner = player };
+                                player.Ships.Add(newShip);
+                                Ships.Add(newShip);
+
+                                Array.ForEach(line, tile =>
+                                {
+                                    tile.Ship = newShip;
+                                    newShip.AllTiles.Add(tile);
+                                });
+
+                                isBuilt = true;
+                            }
+                        }
+                    }
                 });
             }
 

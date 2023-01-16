@@ -4,8 +4,8 @@ namespace BattleShips.Abstractions;
 
 internal abstract class Ship
 {
-    public abstract int Length { get; }
     public bool IsSunk { get; }
-    public List<Tile> ShipTile { get; set; }
+    public abstract int Length { get; }
     public Player Owner { get; set; }
+    public List<Tile> ShipTile { get; set; }
 }

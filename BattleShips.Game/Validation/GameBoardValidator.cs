@@ -14,7 +14,7 @@ internal class GameBoardValidator
 
     public void Validate()
     {
-        List<Exception> exceptions = new List<Exception>();
+        List<Exception> exceptions = new();
 
         if (Options.ShipsAreNonNegativeNumber)
         {
@@ -47,16 +47,16 @@ internal class GameBoardValidator
                 $"Total amount of ships must be greater than 0."));
         }
 
-        if (Options.Players.Count <= 0)
+        switch (Options.Players.Count)
         {
-            exceptions.Add(new InvalidAmountOfPlayersSpecifiedException(
-                $"Total amount of players must be greater than 0."));
-        }
-
-        if (Options.Players.Count > 1)
-        {
-            exceptions.Add(new NotImplementedException(
-                $"MultiPlayer is currently not implemented"));
+            case <= 0:
+                exceptions.Add(new InvalidAmountOfPlayersSpecifiedException(
+                    $"Total amount of players must be greater than 0."));
+                break;
+            case > 1:
+                exceptions.Add(new NotImplementedException(
+                    $"MultiPlayer is currently not implemented"));
+                break;
         }
 
         if (exceptions.Any())

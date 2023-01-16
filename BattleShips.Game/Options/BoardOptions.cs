@@ -8,24 +8,19 @@ namespace BattleShips.Options
         public int MaxNumberOfBattleShips { get; internal set; }
         public int MaxNumberOfDestroyers { get; internal set; }
 
-        public int TotalAmountOfShips 
-            => MaxNumberOfBattleShips + MaxNumberOfDestroyers;
+        public TextWriter Output { get; set; }
 
-        public bool ShipsAreNonNegativeNumber
-        {
-            get
-            {
-                return new[]
-                {
+        public List<Player> Players { get; init; } = new();
+
+        public TextReader Reader { get; set; }
+
+        public bool ShipsAreNonNegativeNumber => new[] {
                     MaxNumberOfBattleShips < 0,
                     MaxNumberOfDestroyers < 0
                 }
                 .Any(condition => condition);
-            }
-        }
 
-        public List<Player> Players { get; init; } = new List<Player>();
-        public TextWriter Output { get; set; }
-        public TextReader Reader { get; set; }
+        public int TotalAmountOfShips
+                    => MaxNumberOfBattleShips + MaxNumberOfDestroyers;
     }
 }

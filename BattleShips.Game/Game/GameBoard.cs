@@ -1,13 +1,11 @@
-﻿using System.Drawing;
-using System.Numerics;
-using BattleShips.Abstractions;
+﻿using BattleShips.Abstractions;
 using BattleShips.Options;
 
 namespace BattleShips.Game
 {
     public sealed class GameBoard
     {
-        private readonly List<Ship> Ships = new List<Ship>();
+        private readonly List<Ship> Ships = new();
 
         public bool InProgress { get; internal set; }
         internal BoardOptions Options { get; set; }

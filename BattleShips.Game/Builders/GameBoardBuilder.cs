@@ -8,33 +8,15 @@ namespace BattleShips.Builders
     {
         private readonly BoardOptions _options = new();
 
-        public GameBoardBuilder SetGridSize(int gridSize)
-        {
-            _options.GridSize = gridSize;
-            return this;
-        }
-
         public GameBoardBuilder AddPlayer(string name)
         {
             _options.Players.Add(new Player(name));
             return this;
         }
 
-        public GameBoardBuilder SetMaxBattleShips(int maxBattleShips)
-        {
-            _options.MaxNumberOfBattleShips = maxBattleShips;
-            return this;
-        }
-
-        public GameBoardBuilder SetMaxDestroyers(int maxDestroyers)
-        {
-            _options.MaxNumberOfDestroyers = maxDestroyers;
-            return this;
-        }
-
         public GameBoard Build()
         {
-            GameBoard gameBoard = new GameBoard();
+            GameBoard gameBoard = new();
 
             try
             {
@@ -53,15 +35,31 @@ namespace BattleShips.Builders
             return gameBoard.Initialize();
         }
 
-        public GameBoardBuilder SetOutput(TextWriter writer)
-        {   
-            _options.Output = writer;
+        public GameBoardBuilder SetGridSize(int gridSize)
+        {
+            _options.GridSize = gridSize;
             return this;
         }
-
         public GameBoardBuilder SetInput(TextReader reader)
         {
             _options.Reader = reader;
+            return this;
+        }
+
+        public GameBoardBuilder SetMaxBattleShips(int maxBattleShips)
+        {
+            _options.MaxNumberOfBattleShips = maxBattleShips;
+            return this;
+        }
+
+        public GameBoardBuilder SetMaxDestroyers(int maxDestroyers)
+        {
+            _options.MaxNumberOfDestroyers = maxDestroyers;
+            return this;
+        }
+        public GameBoardBuilder SetOutput(TextWriter writer)
+        {   
+            _options.Output = writer;
             return this;
         }
     }

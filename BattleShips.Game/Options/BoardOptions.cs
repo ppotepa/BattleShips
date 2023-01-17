@@ -7,9 +7,6 @@ namespace BattleShips.Options
         public int GridSize { get; internal set; }
         public int MaxNumberOfBattleShips { get; internal set; }
         public int MaxNumberOfDestroyers { get; internal set; }
-
-        public TextWriter Output { get; set; }
-
         public List<Player> Players { get; init; } = new();
 
         public TextReader Reader { get; set; }

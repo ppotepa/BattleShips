@@ -10,5 +10,6 @@ namespace BattleShips.Game
         public Tile Left { get; set; }
         public Tile Right { get; set; }
         public bool IsOccupied => Ship is not null;
+        public string Position { get; set; }
     }
 }

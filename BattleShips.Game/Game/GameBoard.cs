@@ -1,8 +1,8 @@
 ﻿using BattleShips.Abstractions;
 using BattleShips.Enumerations;
 using BattleShips.Options;
+using BattleShips.Primitives;
 using BattleShips.Ships;
-using System.Numerics;
 
 namespace BattleShips.Game
 {
@@ -10,7 +10,6 @@ namespace BattleShips.Game
     {
         internal readonly List<Ship> Ships = new();
         private const string YAxisLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
         public bool InProgress { get; internal set; }
         internal BoardOptions Options { get; set; }
         internal Tile[,] Tiles { get; set; }
@@ -22,22 +21,22 @@ namespace BattleShips.Game
                 {
                     if (x == -1)
                     {
-                        Options.Output.Write(y == -1 ? "   " : $"[{y + 1}]");
+                        Console.Write(y == -1 ? "   " : $"[{y + 1}]");
                     }
                     else if (y == -1)
                     {
-                        Options.Output.Write($"[{YAxisLetters[x]}]");
+                        Console.Write($"[{YAxisLetters[x]}]");
                     }
                     else
                     {
-                        Options.Output.Write(Tiles[y, x].Ship != null ? $"[{Tiles[y, x].Ship}]" : "[ ]");
+                        Console.Write(Tiles[y, x].Ship != null ? $"[{Tiles[y, x].Ship}]" : "[ ]");
                     }
                 }
 
-                Options.Output.WriteLine();
+                Console.WriteLine();
             }
 
-            Options.Reader.ReadLine();
+           Console.ReadLine();
         }
 
         internal GameBoard Initialize()
@@ -48,7 +47,7 @@ namespace BattleShips.Game
             {
                 for (int y = 0; y < Options.GridSize; y++)
                 {
-                    Tiles[x, y] = new Tile();
+                    Tiles[x, y] = new Tile { Position = $"{YAxisLetters[x]}{y + 1}" };
                 }
             }
 
@@ -82,17 +81,17 @@ namespace BattleShips.Game
                     {
                         int targetLength = shipType == typeof(BattleShip) ? BattleShip.Length : Destroyer.Length;
 
-                        Vector2 startingPos = new Vector2
+                        Vector2D startingPos = new Vector2D
                         {
                             X = random.Next(0, Options.GridSize),
                             Y = random.Next(0, Options.GridSize)
                         };
 
-                        Tile target = Tiles[(int)startingPos.X, (int)startingPos.Y];
+                        Tile target = Tiles[startingPos.X, startingPos.Y];
                         Tile[] line = default;
 
-                        bool canBuildHorizontal = shipDirection == ShipDirection.Horizontal && startingPos.X < targetLength;
-                        bool canBuildVertical = shipDirection == ShipDirection.Vertical && startingPos.Y < targetLength;
+                        bool canBuildHorizontal = shipDirection == ShipDirection.Horizontal && startingPos.X + targetLength <= Options.GridSize;
+                        bool canBuildVertical = shipDirection == ShipDirection.Vertical && startingPos.Y + targetLength <= Options.GridSize;
 
                         if (canBuildHorizontal || canBuildVertical)
                         {
@@ -119,18 +118,18 @@ namespace BattleShips.Game
 
             return this;
         }
-
         private static Tile[] GenerateLineTiles(Tile target, ShipDirection shipDirection, int shipLength)
         {
             IEnumerable<Tile> result = new[] { target };
 
-            for ((int length, Tile target) data = (1, target); data.length++ < shipLength;)
+            for ((int length, Tile target) data = (1, target); data.length < shipLength; data.length++)
             {
                 data.target = shipDirection == ShipDirection.Horizontal ? data.target.Right : data.target.Down;
                 result = result.Append(data.target);
             }
 
-            return result.ToArray();
+            result = result.ToArray();
+            return result.Any(tile => tile is null) ? Array.Empty<Tile>() : (Tile[])result;
         }
     }
 }

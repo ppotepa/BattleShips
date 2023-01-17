@@ -24,7 +24,7 @@ namespace BattleShips.Builders
             }
             catch (AggregateException ex)
             {
-                _options.Output?.WriteLine(ex.Message);
+                Console.WriteLine(ex.Message);
                 gameBoard.InProgress = false;
                 throw;
             }
@@ -40,11 +40,6 @@ namespace BattleShips.Builders
             _options.GridSize = gridSize;
             return this;
         }
-        public GameBoardBuilder SetInput(TextReader reader)
-        {
-            _options.Reader = reader;
-            return this;
-        }
 
         public GameBoardBuilder SetMaxBattleShips(int maxBattleShips)
         {
@@ -55,11 +50,6 @@ namespace BattleShips.Builders
         public GameBoardBuilder SetMaxDestroyers(int maxDestroyers)
         {
             _options.MaxNumberOfDestroyers = maxDestroyers;
-            return this;
-        }
-        public GameBoardBuilder SetOutput(TextWriter writer)
-        {   
-            _options.Output = writer;
             return this;
         }
     }

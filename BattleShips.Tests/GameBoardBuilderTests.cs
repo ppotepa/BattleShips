@@ -31,9 +31,8 @@ namespace BattleShips.Tests
                 .AddPlayer("Player 1")
                 .SetGridSize(10)
                 .SetMaxBattleShips(2)
-                .SetMaxDestroyers(1)
-                .SetInput(Console.In)
-                .SetOutput(Console.Out);
+                .SetMaxDestroyers(1);
+               
 
             Assert.That(() => builder.Build(), Is.TypeOf<GameBoard>());
         }

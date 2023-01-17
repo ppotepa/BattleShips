@@ -11,8 +11,8 @@ public static class Program
         GameBoard board = new GameBoardBuilder()
             .AddPlayer("Pawel")
             .SetGridSize(10)
-            .SetMaxDestroyers(2)
-            .SetMaxBattleShips(1)
+            .SetMaxDestroyers(4)
+            .SetMaxBattleShips(2)
             .SetInput(Console.In)
             .SetOutput(Console.Out)
             .Build();

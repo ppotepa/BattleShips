@@ -4,5 +4,5 @@ namespace BattleShips.Ships;
 
 internal class BattleShip : Ship
 {
-    public override int Length => 5;
+    public new const int Length = 5;
 }

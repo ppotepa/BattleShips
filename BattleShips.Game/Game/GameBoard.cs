@@ -1,20 +1,14 @@
-﻿using System.Collections.Immutable;
-using BattleShips.Abstractions;
+﻿using BattleShips.Abstractions;
 using BattleShips.Enumerations;
 using BattleShips.Options;
 using BattleShips.Ships;
-using System.Linq;
 using System.Numerics;
-using System.Security.Cryptography;
 
 namespace BattleShips.Game
 {
     public sealed class GameBoard
     {
         internal readonly List<Ship> Ships = new();
-
-        private const byte BattleshipLength = 5;
-        private const byte DestroyerLength = 4;
         private const string YAxisLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
         public bool InProgress { get; internal set; }
@@ -22,8 +16,6 @@ namespace BattleShips.Game
         internal Tile[,] Tiles { get; set; }
         public void Tick()
         {
-            Options.Output.Close();
-
             for (int x = -1; x < Options.GridSize; x++)
             {
                 for (int y = -1; y < Options.GridSize; y++)
@@ -74,7 +66,7 @@ namespace BattleShips.Game
 
             foreach (Player player in Options.Players)
             {
-                Random random = new Random();
+                Random random = new();
 
                 IEnumerable<Type> battleShips = Enumerable.Repeat(typeof(BattleShip), Options.MaxNumberOfBattleShips);
                 IEnumerable<Type> destroyers = Enumerable.Repeat(typeof(Destroyer), Options.MaxNumberOfDestroyers);
@@ -84,11 +76,11 @@ namespace BattleShips.Game
                 allShips.ForEach(shipType =>
                 {
                     ShipDirection shipDirection = (ShipDirection)random.Next(1, 3);
-                    bool isBuilt = false;
+                    bool shipBuilt = false;
 
-                    while (isBuilt is false)
+                    while (shipBuilt is false)
                     {
-                        int targetLength = shipType == typeof(BattleShip) ? BattleshipLength : DestroyerLength;
+                        int targetLength = shipType == typeof(BattleShip) ? BattleShip.Length : Destroyer.Length;
 
                         Vector2 startingPos = new Vector2
                         {
@@ -103,13 +95,14 @@ namespace BattleShips.Game
                         bool canBuildVertical = shipDirection == ShipDirection.Vertical && startingPos.Y < targetLength;
 
                         if (canBuildHorizontal || canBuildVertical)
+                        {
                             line = GenerateLineTiles(target, shipDirection, targetLength);
+                        }
 
                         if (line != null && line.All(tile => tile.IsOccupied is false))
                         {
                             Ship newShip = Ship.Create(shipType, target, player);
                             player.Ships.Add(newShip);
-                            Ships.Add(newShip);
 
                             Array.ForEach(line, tile =>
                             {
@@ -117,7 +110,8 @@ namespace BattleShips.Game
                                 newShip.AllTiles.Add(tile);
                             });
 
-                            isBuilt = true;
+                            this.Ships.Add(newShip);
+                            shipBuilt = true;
                         }
                     }
                 });
@@ -126,20 +120,13 @@ namespace BattleShips.Game
             return this;
         }
 
-        private Tile[] GenerateLineTiles(Tile target, ShipDirection shipDirection, int shipLength)
+        private static Tile[] GenerateLineTiles(Tile target, ShipDirection shipDirection, int shipLength)
         {
             IEnumerable<Tile> result = new[] { target };
 
             for ((int length, Tile target) data = (1, target); data.length++ < shipLength;)
             {
-                if (shipDirection == ShipDirection.Horizontal)
-                {
-                    data.target = data.target.Right;
-                }
-                else
-                {
-                    data.target = data.target.Down;
-                }
+                data.target = shipDirection == ShipDirection.Horizontal ? data.target.Right : data.target.Down;
                 result = result.Append(data.target);
             }
 

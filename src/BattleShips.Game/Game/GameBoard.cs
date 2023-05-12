@@ -14,11 +14,31 @@ namespace BattleShips.Game
 
         private const string YAxisLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private readonly Regex _pattern = new("([A-Za-z][1-9]|[1-9])");
+        private Action _executionStrategy;
+
         public bool InProgress => Ships.Any(ship => ship.IsSunk is false);
         internal BoardOptions Options { get; set; }
         internal Tile[,] Tiles { get; set; }
 
-        public void Tick()
+        internal Action ExecutionStrategy
+        {
+            get
+            {
+                return _executionStrategy ??= Options.Players.Count switch
+                {
+                    1 => SinglePlayerExecutionStrategy,
+                    > 1 => MultiPlayerExecutionStrategy,
+                    _ => _executionStrategy
+                };
+            }
+        }
+
+        private void MultiPlayerExecutionStrategy()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SinglePlayerExecutionStrategy()
         {
             string input;
             Tile targetTile = default;
@@ -56,6 +76,11 @@ namespace BattleShips.Game
                     }
                 }
             }
+        }
+
+        public void Tick()
+        {
+            ExecutionStrategy();
         }
 
         internal GameBoard Initialize()
@@ -182,7 +207,7 @@ namespace BattleShips.Game
                             {
                                 Options.Output.Write($"[ ]");
                             }
-                            
+
                         }
                     }
                 }

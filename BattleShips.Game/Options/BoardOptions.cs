@@ -6,6 +6,7 @@ namespace BattleShips.Options
     {
         public TextWriter Output = Console.Out;
 
+        internal bool DebugModeEnabled { get; set; }
         public int GridSize { get; internal set; }
         public TextReader Input { get; set; }
         public int MaxNumberOfBattleShips { get; internal set; }

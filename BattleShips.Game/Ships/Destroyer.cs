@@ -4,6 +4,6 @@ namespace BattleShips.Ships
 {
     internal class Destroyer : Ship
     {
-        public new const int Length = 4;
+        public const int Length = 4;
     }
 }

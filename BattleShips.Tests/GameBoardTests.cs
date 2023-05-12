@@ -70,6 +70,7 @@ namespace BattleShips.Tests
         [SetUp]
         public void Setup()
         {
+            //intentionally left empty
         }
 
         [Test]
@@ -95,5 +96,29 @@ namespace BattleShips.Tests
             bool containsCorrectDestroyer = gameBoard.Ships.First(ship => ship.GetType() == typeof(Destroyer)).AllTiles.Count == Destroyer.Length;
             Assert.That(gameBoard.Ships.Count is 2 && containsCorrectDestroyer && containsCorrectBattleShip, Is.True);
         }
+
+        [Test]
+        public void Sinking_All_Ships_Results_In_Game_Over()
+        {
+            GameBoard gameBoard = new()
+            {
+                Options = new BoardOptions
+                {
+                    GridSize = 10,
+                    MaxNumberOfBattleShips = 1,
+                    Players =
+                    {
+                        new Player("Player 1")
+                    }
+                }
+            };
+            
+            gameBoard.Initialize();
+            gameBoard.Ships.ForEach(ship => ship.AllTiles.ForEach(tile => tile.MarkAsAHit()));
+
+
+            Assert.That(gameBoard.InProgress, Is.False);
+        }
+
     }
 }

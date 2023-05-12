@@ -1,7 +1,9 @@
 using BattleShips.Builders;
 using BattleShips.Exceptions;
 using BattleShips.Game;
+using Newtonsoft.Json;
 using NUnit.Framework;
+using System.Text;
 
 namespace BattleShips.Tests
 {
@@ -30,6 +32,8 @@ namespace BattleShips.Tests
             GameBoardBuilder? builder = new GameBoardBuilder()
                 .AddPlayer("Player 1")
                 .SetGridSize(10)
+                .SetInput(Console.In)
+                .SetOutput(Console.Out)
                 .SetMaxBattleShips(2)
                 .SetMaxDestroyers(1);
                
@@ -114,6 +118,27 @@ namespace BattleShips.Tests
 
             Assert.That(() => builder.Build(), 
                 Throws.TypeOf<AggregateException>().With.InnerException.TypeOf<InvalidGridSizeException>()
+            );
+        }
+
+        [Test]
+        public void User_Cannot_Place_A_Shot_Out_Of_Bounds()
+        {
+            string playerInput = "A20";
+            StringReader playerInputReader = new StringReader(playerInput);
+
+            GameBoardBuilder? builder = new GameBoardBuilder()
+                .AddPlayer("Player 1")
+                .SetGridSize(10)
+                .SetInput(playerInputReader)
+                .SetOutput(Console.Out)
+                .SetMaxBattleShips(2)
+                .SetMaxDestroyers(1);
+
+            GameBoard? board = builder.Build();
+
+            Assert.That(() => board.Tick(),
+                Throws.TypeOf<IndexOutOfRangeException>()
             );
         }
     }

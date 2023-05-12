@@ -14,7 +14,7 @@ namespace BattleShips.Game
         internal readonly List<Ship> Ships = new();
 
         private const string YAxisLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private readonly Regex _pattern = new Regex("([A-Za-z][1-9]|[1-9])");
+        private readonly Regex _pattern = new("([A-Za-z][1-9]|[1-9])");
         public bool InProgress => Ships.Any(ship => ship.IsSunk is false);
         internal BoardOptions Options { get; set; }
         internal Tile[,] Tiles { get; set; }
@@ -30,15 +30,16 @@ namespace BattleShips.Game
             }
             while (input != null && !_pattern.IsMatch(input));
 
-            (int yAxis, int xAxis) coords = input.ToGameBoardCoordinates();
+            Vector2D coords = input.ToGameBoardCoordinates();
 
             try
             {
-                targetTile = Tiles[coords.xAxis - 1, coords.yAxis - 1];
+                targetTile = Tiles[coords.X - 1, coords.Y - 1];
             }
             catch (IndexOutOfRangeException)
             {
                 Options.Output.WriteLine($"{input?.ToUpper()} is Out of Bounds. Try again.");
+                throw;
             }
 
             if (targetTile is { IsOccupied: true })
@@ -56,8 +57,6 @@ namespace BattleShips.Game
                     }
                 }
             }
-
-            Draw();
         }
 
         internal GameBoard Initialize()
@@ -102,7 +101,7 @@ namespace BattleShips.Game
                     {
                         int targetLength = shipType == typeof(BattleShip) ? BattleShip.Length : Destroyer.Length;
 
-                        Vector2D startingPos = new Vector2D
+                        Vector2D startingPos = new()
                         {
                             X = random.Next(0, Options.GridSize),
                             Y = random.Next(0, Options.GridSize)
@@ -154,7 +153,7 @@ namespace BattleShips.Game
             return result.Any(tile => tile is null) ? Array.Empty<Tile>() : (Tile[])result;
         }
 
-        private void Draw()
+        public void Draw()
         {
             for (int x = -1; x < Options.GridSize; x++)
             {
@@ -176,7 +175,15 @@ namespace BattleShips.Game
                         }
                         else
                         {
-                            Options.Output.Write(Tiles[y, x].Ship != null ? $"[{Tiles[y, x].Ship}]" : "[ ]");
+                            if (Options.DebugModeEnabled)
+                            {
+                                Options.Output.Write(Tiles[y, x].Ship != null ? $"[{Tiles[y, x].Ship}]" : "[ ]");
+                            }
+                            else
+                            {
+                                Options.Output.Write($"[ ]");
+                            }
+                            
                         }
                     }
                 }

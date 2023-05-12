@@ -66,5 +66,11 @@ namespace BattleShips.Builders
             _options.Input = input;
             return this;
         }
+
+        public GameBoardBuilder EnableDebugMode()
+        {
+            this._options.DebugModeEnabled = true;
+            return this;
+        }
     }
 }

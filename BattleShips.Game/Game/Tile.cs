@@ -4,12 +4,15 @@ namespace BattleShips.Game
 {
     internal sealed class Tile
     {
+        public Tile Down { get; set; }
+        public bool Hit { get; set; }
+        public bool IsOccupied => Ship is not null;
+        public Tile Left { get; set; }
+        public string Position { get; set; }
+        public Tile Right { get; set; }
         public Ship Ship { get; set; }
         public Tile Up { get; set; }
-        public Tile Down { get; set; }
-        public Tile Left { get; set; }
-        public Tile Right { get; set; }
-        public bool IsOccupied => Ship is not null;
-        public string Position { get; set; }
+
+        public void MarkAsAHit() => this.Hit = true;
     }
 }

@@ -18,7 +18,7 @@ internal class GameBoardValidator
 
         if (Options.ShipsAreNonNegativeNumber)
         {
-            exceptions.Add(new InvalidAmountOfShipsSpecifiedException(message:"Amount of any ships cannot be a negative number."));
+            exceptions.Add(new InvalidAmountOfShipsSpecifiedException(message: "Amount of any ships cannot be a negative number."));
         }
 
         if (Options.GridSize < 0)
@@ -52,14 +52,21 @@ internal class GameBoardValidator
         {
             case <= 0:
                 exceptions.Add(new InvalidAmountOfPlayersSpecifiedException(
-                    message:"Total amount of players must be greater than 0.")
+                    message: "Total amount of players must be greater than 0.")
                 );
                 break;
             case > 1:
-                exceptions.Add(new NotImplementedException(                    
+                exceptions.Add(new NotImplementedException(
                     message: "MultiPlayer is currently not implemented")
                 );
                 break;
+        }
+
+        if (new object[] { Options.Input, Options.Output }.Any(option => option is null))
+        {
+            exceptions.Add(new NotImplementedException(
+                message: "Input and Output have to be specified.")
+            );
         }
 
         if (exceptions.Any())

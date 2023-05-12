@@ -1,5 +1,8 @@
-﻿using BattleShips.Abstractions;
+﻿using System.Net.NetworkInformation;
+using System.Text.RegularExpressions;
+using BattleShips.Abstractions;
 using BattleShips.Enumerations;
+using BattleShips.Extensions;
 using BattleShips.Options;
 using BattleShips.Primitives;
 using BattleShips.Ships;
@@ -9,34 +12,52 @@ namespace BattleShips.Game
     public sealed class GameBoard
     {
         internal readonly List<Ship> Ships = new();
+
         private const string YAxisLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        public bool InProgress { get; internal set; }
+        private readonly Regex _pattern = new Regex("([A-Za-z][1-9]|[1-9])");
+        public bool InProgress => Ships.Any(ship => ship.IsSunk is false);
         internal BoardOptions Options { get; set; }
         internal Tile[,] Tiles { get; set; }
+
         public void Tick()
         {
-            for (int x = -1; x < Options.GridSize; x++)
-            {
-                for (int y = -1; y < Options.GridSize; y++)
-                {
-                    if (x == -1)
-                    {
-                        Console.Write(y == -1 ? "   " : $"[{y + 1}]");
-                    }
-                    else if (y == -1)
-                    {
-                        Console.Write($"[{YAxisLetters[x]}]");
-                    }
-                    else
-                    {
-                        Console.Write(Tiles[y, x].Ship != null ? $"[{Tiles[y, x].Ship}]" : "[ ]");
-                    }
-                }
+            string input;
+            Tile targetTile = default;
 
-                Console.WriteLine();
+            do
+            {
+                input = Options.Input.ReadLine();
+            }
+            while (input != null && !_pattern.IsMatch(input));
+
+            (int yAxis, int xAxis) coords = input.ToGameBoardCoordinates();
+
+            try
+            {
+                targetTile = Tiles[coords.xAxis - 1, coords.yAxis - 1];
+            }
+            catch (IndexOutOfRangeException)
+            {
+                Options.Output.WriteLine($"{input?.ToUpper()} is Out of Bounds. Try again.");
             }
 
-           Console.ReadLine();
+            if (targetTile is { IsOccupied: true })
+            {
+                targetTile.MarkAsAHit();
+                Options.Output.WriteLine($"{input?.ToUpper()} was a BullsEye ! Keep shooting.");
+
+                if (targetTile.Ship.AllTiles.All(tile => tile.Hit))
+                {
+                    Options.Output.WriteLine($"Congratulations, you've sunk a {targetTile.Ship.FullName}. Keep stacking them up!");
+
+                    if (Ships.All(ship => ship.IsSunk))
+                    {
+                        Options.Output.WriteLine("Game is over. All Enemy Ships have been sunk. You win.");
+                    }
+                }
+            }
+
+            Draw();
         }
 
         internal GameBoard Initialize()
@@ -98,7 +119,7 @@ namespace BattleShips.Game
                             line = GenerateLineTiles(target, shipDirection, targetLength);
                         }
 
-                        if (line != null && line.All(tile => tile.IsOccupied is false))
+                        if (line == null || !line.All(tile => tile.IsOccupied is false)) continue;
                         {
                             Ship newShip = Ship.Create(shipType, target, player);
                             player.Ships.Add(newShip);
@@ -118,6 +139,7 @@ namespace BattleShips.Game
 
             return this;
         }
+
         private static Tile[] GenerateLineTiles(Tile target, ShipDirection shipDirection, int shipLength)
         {
             IEnumerable<Tile> result = new[] { target };
@@ -130,6 +152,37 @@ namespace BattleShips.Game
 
             result = result.ToArray();
             return result.Any(tile => tile is null) ? Array.Empty<Tile>() : (Tile[])result;
+        }
+
+        private void Draw()
+        {
+            for (int x = -1; x < Options.GridSize; x++)
+            {
+                for (int y = -1; y < Options.GridSize; y++)
+                {
+                    if (x == -1)
+                    {
+                        Options.Output.Write(y == -1 ? "   " : $"[{y + 1}]");
+                    }
+                    else if (y == -1)
+                    {
+                        Options.Output.Write($"[{YAxisLetters[x]}]");
+                    }
+                    else
+                    {
+                        if (Tiles[y, x].Hit)
+                        {
+                            Options.Output.Write("[X]");
+                        }
+                        else
+                        {
+                            Options.Output.Write(Tiles[y, x].Ship != null ? $"[{Tiles[y, x].Ship}]" : "[ ]");
+                        }
+                    }
+                }
+
+                Options.Output.WriteLine();
+            }
         }
     }
 }

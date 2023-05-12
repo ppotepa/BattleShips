@@ -24,12 +24,14 @@ namespace BattleShips.Builders
             }
             catch (AggregateException ex)
             {
-                Console.WriteLine(ex.Message);
-                gameBoard.InProgress = false;
+                if (_options.Output != null)
+                {
+                    _options.Output?.WriteLine(ex.Message);
+                }
+
                 throw;
             }
 
-            gameBoard.InProgress = true;
             gameBoard.Options = _options;
 
             return gameBoard.Initialize();
@@ -50,6 +52,18 @@ namespace BattleShips.Builders
         public GameBoardBuilder SetMaxDestroyers(int maxDestroyers)
         {
             _options.MaxNumberOfDestroyers = maxDestroyers;
+            return this;
+        }
+
+        public GameBoardBuilder SetOutput(TextWriter output)
+        {
+            _options.Output = output;
+            return this;
+        }
+
+        public GameBoardBuilder SetInput(TextReader input)
+        {
+            _options.Input = input;
             return this;
         }
     }

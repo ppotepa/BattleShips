@@ -122,7 +122,7 @@ namespace BattleShips.Tests
         public void User_Cannot_Place_A_Shot_Out_Of_Bounds()
         {
             string playerInput = "A20";
-            StringReader playerInputReader = new StringReader(playerInput);
+            StringReader playerInputReader = new(playerInput);
 
             GameBoardBuilder? builder = new GameBoardBuilder()
                 .AddPlayer("Player 1")

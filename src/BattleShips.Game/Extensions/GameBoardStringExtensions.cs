@@ -6,11 +6,16 @@ namespace BattleShips.Extensions
     {
         public static Vector2D ToGameBoardCoordinates(this string input)
         {
-            return new Vector2D
+            if (input.Length > 1)
             {
-                X = char.ToUpper(input[0]) - 64,
-                Y = short.Parse(input.Substring(1, input.Length - 1))
-            };
+                return new Vector2D
+                {
+                    X = char.ToUpper(input[0]) - 64,
+                    Y = short.Parse(input.Substring(1, input.Length - 1))
+                };
+            }
+
+            throw new ArgumentException("Input string was too short.");
         }
     }
 }

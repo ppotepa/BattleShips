@@ -106,6 +106,7 @@ namespace BattleShips.Tests
         [SetUp]
         public void Setup()
         {
+            //intentionally left-empty
         }
 
         [Test]

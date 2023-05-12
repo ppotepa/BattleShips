@@ -117,7 +117,7 @@ namespace BattleShips.Game
                             line = GenerateLineTiles(target, shipDirection, targetLength);
                         }
 
-                        if (line == null || !line.All(tile => tile.IsOccupied is false)) continue;
+                        if (line != null && line.All(tile => tile.IsOccupied is false))
                         {
                             Ship newShip = Ship.Create(shipType, target, player);
                             player.Ships.Add(newShip);

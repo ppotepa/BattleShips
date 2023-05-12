@@ -1,6 +1,5 @@
 ﻿namespace BattleShips.Exceptions
 {
-    [Serializable]
     public class InvalidGridSizeException : Exception
     {
         public InvalidGridSizeException() { }

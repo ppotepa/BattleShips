@@ -1,10 +1,8 @@
+using BattleShips.Builders;
 using BattleShips.Game;
+using BattleShips.Options;
 using BattleShips.Ships;
 using NUnit.Framework;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using BattleShips.Options;
 
 namespace BattleShips.Tests
 {
@@ -118,6 +116,27 @@ namespace BattleShips.Tests
 
 
             Assert.That(gameBoard.InProgress, Is.False);
+        }
+
+        [Test]
+        public void User_Cannot_Place_A_Shot_Out_Of_Bounds()
+        {
+            string playerInput = "A20";
+            StringReader playerInputReader = new StringReader(playerInput);
+
+            GameBoardBuilder? builder = new GameBoardBuilder()
+                .AddPlayer("Player 1")
+                .SetGridSize(10)
+                .SetInput(playerInputReader)
+                .SetOutput(Console.Out)
+                .SetMaxBattleShips(2)
+                .SetMaxDestroyers(1);
+
+            GameBoard? board = builder.Build();
+
+            Assert.That(() => board.Tick(),
+                Throws.TypeOf<IndexOutOfRangeException>()
+            );
         }
 
     }

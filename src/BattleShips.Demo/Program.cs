@@ -1,6 +1,6 @@
-﻿using System;
-using BattleShips.Builders;
+﻿using BattleShips.Builders;
 using BattleShips.Game;
+using System;
 
 namespace BattleShips.Demo;
 

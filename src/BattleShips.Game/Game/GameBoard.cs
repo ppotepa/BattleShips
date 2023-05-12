@@ -1,11 +1,10 @@
-﻿using System.Net.NetworkInformation;
-using System.Text.RegularExpressions;
-using BattleShips.Abstractions;
+﻿using BattleShips.Abstractions;
 using BattleShips.Enumerations;
 using BattleShips.Extensions;
 using BattleShips.Options;
 using BattleShips.Primitives;
 using BattleShips.Ships;
+using System.Text.RegularExpressions;
 
 namespace BattleShips.Game
 {

@@ -76,6 +76,10 @@ namespace BattleShips.Game
                     }
                 }
             }
+            else
+            {
+                Options.Output.WriteLine($"{input?.ToUpper()} was a miss.");
+            }
         }
 
         public void Tick()

@@ -197,22 +197,7 @@ namespace BattleShips.Game
                     }
                     else
                     {
-                        if (Tiles[y, x].Hit)
-                        {
-                            Options.Output.Write("[X]");
-                        }
-                        else
-                        {
-                            if (Options.DebugModeEnabled)
-                            {
-                                Options.Output.Write(Tiles[y, x].Ship != null ? $"[{Tiles[y, x].Ship}]" : "[ ]");
-                            }
-                            else
-                            {
-                                Options.Output.Write($"[ ]");
-                            }
-
-                        }
+                        Options.Output.Write(Tiles[y, x]);
                     }
                 }
 

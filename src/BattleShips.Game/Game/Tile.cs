@@ -14,5 +14,11 @@ namespace BattleShips.Game
         public Tile Up { get; set; }
 
         public void MarkAsAHit() => this.Hit = true;
+
+        public override string ToString()
+        {
+            if (Hit) return "[X]";
+            return IsOccupied ? $"[{Ship}]" : "[ ]";
+        }
     }
 }

@@ -15,7 +15,7 @@ public static class Program
             .SetGridSize(10)
             .SetMaxDestroyers(2)
             // EnableDebugMode allows you to see where the ships are placed from the start
-            .EnableDebugMode() 
+            //.EnableDebugMode() 
             .SetMaxBattleShips(1)
             .Build();
 

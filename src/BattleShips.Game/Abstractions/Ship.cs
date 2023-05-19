@@ -9,6 +9,7 @@ internal abstract class Ship
     public bool IsSunk => AllTiles.All(tile => tile.Hit);
     public Player Owner { get; set; }
     public Tile ShipTile { get; set; }
+
     public static Ship Create(Type shipType, Tile target, Player player)
     {
         if (shipType == typeof(BattleShip)) return new BattleShip { Owner = player, ShipTile = target };

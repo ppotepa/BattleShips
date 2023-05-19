@@ -14,31 +14,12 @@ namespace BattleShips.Game
 
         private const string YAxisLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private readonly Regex _pattern = new("([A-Za-z][1-9]|[1-9])");
-        private Action _executionStrategy;
 
         public bool InProgress => Ships.Any(ship => ship.IsSunk is false);
         internal BoardOptions Options { get; set; }
         internal Tile[,] Tiles { get; set; }
-
-        internal Action ExecutionStrategy
-        {
-            get
-            {
-                return _executionStrategy ??= Options.Players.Count switch
-                {
-                    1 => SinglePlayerExecutionStrategy,
-                    > 1 => MultiPlayerExecutionStrategy,
-                    _ => _executionStrategy
-                };
-            }
-        }
-
-        private void MultiPlayerExecutionStrategy()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void SinglePlayerExecutionStrategy()
+       
+        public void Tick()
         {
             string input;
             Tile targetTile = default;
@@ -53,7 +34,7 @@ namespace BattleShips.Game
 
             try
             {
-                targetTile = Tiles[coords.X - 1, coords.Y - 1];
+                targetTile = Tiles[coords.Y - 1, coords.X - 1];
             }
             catch (IndexOutOfRangeException)
             {
@@ -80,11 +61,6 @@ namespace BattleShips.Game
             {
                 Options.Output.WriteLine($"{input?.ToUpper()} was a miss.");
             }
-        }
-
-        public void Tick()
-        {
-            ExecutionStrategy();
         }
 
         internal GameBoard Initialize()
@@ -197,7 +173,12 @@ namespace BattleShips.Game
                     }
                     else
                     {
-                        Options.Output.Write(Tiles[y, x]);
+                        if (Options.DebugModeEnabled) Options.Output.Write(Tiles[y, x]);
+                        else if (Tiles[y, x].Hit)
+                        {
+                            Options.Output.Write(Tiles[y, x]);
+                        }
+                        else Options.Output.Write("   ");
                     }
                 }
 

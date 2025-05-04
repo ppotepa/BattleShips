@@ -1,5 +1,7 @@
 # BattleShips
 
+> **❗️ THIS PROJECT IS A RECRUITMENT TASK **
+
 A simple C# implementation of the classic Battleship game, organized as a .NET solution with a game engine library, a console demo application, and unit tests—all targeting .NET 6.0.
 
 ## Table of Contents
